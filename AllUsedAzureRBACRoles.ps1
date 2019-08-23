@@ -1,6 +1,8 @@
-﻿try {
+try {
 
-    $roles = Get-AzureADDirectoryRole
+    function ConnectAzureAD {
+        connect-azuread
+    }
 
     function GetRBACRoles($roles) {
         $rbac_roles = @()
@@ -18,9 +20,19 @@
         return $rbac_members
     }
 
-    Echo "Getting all roles"
+    Echo "[INFO] - Connecting with Azure"
+    ConnectAzureAD
+
+    $roles = Get-AzureADDirectoryRole
+
+    Echo "[INFO] - Getting all roles"
     $myrole = GetRBACRoles $roles
 
+    Echo "[INFO] - Finished getting roles (Found: $($myrole.count))"
+    $myrole | export-csv rbac_roles.csv -Append -force
+    Echo "[INFO] - Ceated csv-list -> Saved @ $(Get-Location)rbac_roles.csv"
+
+    pause | out-null
 } catch {
     echo "Erorr $($_.Exception.Message)"
     pause
